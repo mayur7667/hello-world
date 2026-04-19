@@ -1,14 +1,10 @@
-# Use official Java 21 runtime
-FROM eclipse-temurin:21-jdk
-
-# Set working directory
+FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
+COPY . .
+RUN ./gradlew build -x test
 
-# Copy jar file
-COPY build/libs/*.jar app.jar
-
-# Expose port
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
 EXPOSE 8080
-
-# Run app
 ENTRYPOINT ["java", "-jar", "app.jar"]
